@@ -17,7 +17,7 @@ def main():
     model = YOLO(args.weights)
     model.train(
         data="configs/ppe.yaml",
-        project="runs/ppe",
+        project=str(ROOT / "runs" / "ppe"),
         exist_ok=True,
         **params,
     )

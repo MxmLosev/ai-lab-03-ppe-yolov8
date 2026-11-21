@@ -10,7 +10,9 @@ from common import (
     TARGET_TOTAL,
     data_dir,
     read_labels,
+    sanitize_boxes,
     save_json,
+    write_labels,
 )
 
 POOL = data_dir() / "_pool"
@@ -98,6 +100,7 @@ def main():
             old.unlink()
     manifest = {s: {} for s in SPLITS}
     used = 0
+    clipped_total, dropped_total = 0, 0
     for rec in records:
         split = assigned.get(rec["group"])
         if split is None:
@@ -105,9 +108,12 @@ def main():
         used += 1
         stem = Path(rec["file"]).stem
         shutil.copy2(POOL / "images" / rec["file"], data / "images" / split / rec["file"])
-        shutil.copy2(POOL / "labels" / (stem + ".txt"), data / "labels" / split / (stem + ".txt"))
+        boxes, n_clip, n_drop = sanitize_boxes(read_labels(POOL / "labels" / (stem + ".txt")))
+        clipped_total += n_clip
+        dropped_total += n_drop
+        write_labels(data / "labels" / split / (stem + ".txt"), boxes)
         manifest[split][rec["file"]] = rec["group"]
-    print(f"used {used} of {len(records)} pool images")
+    print(f"used {used} of {len(records)} pool images; boxes clipped {clipped_total}, dropped {dropped_total}")
 
     print(f"{'split':6} {'images':>6} {'groups':>6} {'target':>6}")
     for s in SPLITS:

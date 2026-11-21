@@ -63,9 +63,28 @@ def read_labels(path: Path):
     return boxes
 
 
+def write_labels(path: Path, boxes):
+    lines = [f"{int(c)} {x:.6f} {y:.6f} {w:.6f} {h:.6f}" for c, x, y, w, h in boxes]
+    path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+
+
 def xywh_to_xyxy(box):
     _, x, y, w, h = box
     return (x - w / 2, y - h / 2, x + w / 2, y + h / 2)
+
+
+def sanitize_boxes(boxes, min_wh=0.001):
+    out, n_clipped, n_dropped = [], 0, 0
+    for cls, x, y, w, h in boxes:
+        x1, y1 = max(0.0, x - w / 2), max(0.0, y - h / 2)
+        x2, y2 = min(1.0, x + w / 2), min(1.0, y + h / 2)
+        if x2 - x1 < min_wh or y2 - y1 < min_wh:
+            n_dropped += 1
+            continue
+        if (x1, y1, x2, y2) != (x - w / 2, y - h / 2, x + w / 2, y + h / 2):
+            n_clipped += 1
+        out.append((cls, (x1 + x2) / 2, (y1 + y2) / 2, x2 - x1, y2 - y1))
+    return out, n_clipped, n_dropped
 
 
 def iou_xyxy(a, b) -> float:

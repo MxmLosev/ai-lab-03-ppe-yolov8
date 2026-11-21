@@ -1,0 +1,11 @@
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+runs/
+data/images/
+data/labels/
+data/_pool/
+/yolov8n.pt
+*.tmp

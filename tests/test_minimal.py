@@ -67,7 +67,7 @@ def test_no_split_leaks(split_images):
             assert h not in hashes, f"same content in {hashes.get(h)} and {s}: {img.name}"
             hashes[h] = s
             g = group_key(img.stem)
-            assert g not in groups, f"group {g} in {groups.get(g)} and {s}"
+            assert groups.get(g, s) == s, f"group {g} in {groups.get(g)} and {s}"
             groups[g] = s
 
 
@@ -82,10 +82,10 @@ def test_visualizer_output_size(tmp_path):
     gts = [{"cls": 0, "box": [0.2, 0.2, 0.4, 0.4]}]
     preds = [{"cls": 0, "conf": 0.9, "box": [0.25, 0.25, 0.4, 0.4]}]
     cell = eg.make_cell(path, gts, preds, ["test line"])
-    out = eg.render_gallery([cell], tmp_path / "gallery.png")
+    out = eg.render_gallery([cell] * (eg.COLS + 1), tmp_path / "gallery.png")
     assert cell.shape[1] == eg.CELL_W
     assert out.shape[1] == eg.COLS * eg.CELL_W
-    assert out.shape[0] > cell.shape[0]
+    assert out.shape[0] == 2 * cell.shape[0]
 
 
 def test_model_output_schema(ppe_yaml, split_images):

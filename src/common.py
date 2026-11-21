@@ -98,13 +98,25 @@ def iou_xyxy(a, b) -> float:
     return inter / union if union > 0 else 0.0
 
 
+def _box_of(x):
+    if isinstance(x, dict):
+        return x["box"]
+    return x[1:5]
+
+
+def _cls_of(x):
+    if isinstance(x, dict):
+        return x["cls"]
+    return x[0]
+
+
 def greedy_match(preds, gts, iou_thr=0.5, class_agnostic=False):
     cand = []
     for pi, p in enumerate(preds):
         for gi, g in enumerate(gts):
-            if not class_agnostic and p[0] != g[0]:
+            if not class_agnostic and _cls_of(p) != _cls_of(g):
                 continue
-            i = iou_xyxy(p[1:5], g[1:5])
+            i = iou_xyxy(_box_of(p), _box_of(g))
             if i >= iou_thr:
                 cand.append((i, pi, gi))
     cand.sort(reverse=True)

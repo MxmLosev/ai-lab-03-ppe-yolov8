@@ -8,7 +8,8 @@ import numpy as np
 import torch
 from ultralytics import YOLO, settings
 from ultralytics.data.augment import LetterBox
-from ultralytics.utils.ops import non_max_suppression, scale_boxes
+from ultralytics.utils.nms import non_max_suppression
+from ultralytics.utils.ops import scale_boxes
 from ultralytics.utils.torch_utils import select_device
 
 from common import data_dir, list_images, repo_root, save_json
@@ -48,6 +49,7 @@ def main():
     letterbox = LetterBox(args.imgsz, auto=False, center=True)
 
     raw = [cv2.imread(str(p)) for p in images]
+    lb_shapes = [letterbox(image=img).shape for img in raw]
 
     def decode():
         return cv2.imread(str(images[0]))
@@ -66,17 +68,17 @@ def main():
     def postprocess(pred, idx):
         det = non_max_suppression(pred, conf_thres=CONF, iou_thres=IOU_NMS, max_det=300)[0]
         if len(det):
-            scale_boxes(letterbox.shape, det[:, :4], raw[idx].shape).view(-1)
+            scale_boxes(lb_shapes[idx], det[:, :4], raw[idx].shape)
         return det
 
     def full(idx):
         t0 = time.perf_counter()
         img = cv2.imread(str(images[idx]))
         t1 = time.perf_counter()
-        im = letterbox(image=img)
-        im = im.transpose(2, 0, 1)[::-1]
+        lb_img = letterbox(image=img)
+        im = lb_img.transpose(2, 0, 1)[::-1]
         im = np.ascontiguousarray(im)
-        t = torch.from_numpy(im).to(device).float() / 255.0
+        t = torch.from_numpy(im).to(device).float().unsqueeze(0) / 255.0
         t2 = time.perf_counter()
         with torch.no_grad():
             pred = net(t)
@@ -85,7 +87,7 @@ def main():
         t3 = time.perf_counter()
         det = non_max_suppression(pred, conf_thres=CONF, iou_thres=IOU_NMS, max_det=300)[0]
         if len(det):
-            scale_boxes(letterbox.shape, det[:, :4], img.shape).view(-1)
+            scale_boxes(lb_img.shape, det[:, :4], img.shape)
         t4 = time.perf_counter()
         return [t0, t1, t2, t3, t4]
 

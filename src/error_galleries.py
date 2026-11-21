@@ -93,21 +93,25 @@ def analyze(items, conf_thr):
             if preds[pi]["cls"] != gts[gi]["cls"]:
                 confusions.append((preds[pi]["conf"], img, preds[pi], gts[gi], [f"G:{CLASS_NAMES[gts[gi]['cls']]} -> P:{CLASS_NAMES[preds[pi]['cls']]} {preds[pi]['conf']:.2f}"]))
                 break
-        small_gts = [g for g in gts if g["box"][2] * g["box"][3] < 0.002]
+        small_gts = [g for g in gts]
         if small_gts:
             g = min(small_gts, key=lambda g: g["box"][2] * g["box"][3])
-            small.append((g["box"][2] * g["box"][3], img, g, [f"small GT area={g['box'][2]*g['box'][3]:.4f}"]))
+            if g["box"][2] * g["box"][3] < 0.006:
+                small.append((g["box"][2] * g["box"][3], img, g, [f"small GT area={g['box'][2]*g['box'][3]:.4f}"]))
+        suspects = []
         for a in range(len(gts)):
             for b in range(a + 1, len(gts)):
-                if gts[a]["cls"] == gts[b]["cls"] and iou_xyxy(gts[a]["box"], gts[b]["box"]) >= 0.85:
-                    gt_err.append((1.0, img, gts[a], [f"duplicate GT {CLASS_NAMES[gts[a]['cls']]} IoU>=0.85"]))
-                    break
-            else:
-                continue
-            break
-        if not gt_err or gt_err[-1][1] != img:
-            if gts and (gts[0]["box"][2] * gts[0]["box"][3]) > 0.9:
-                gt_err.append((0.9, img, gts[0], [f"huge GT box area>0.9 {CLASS_NAMES[gts[0]['cls']]}"]))
+                i_aa = iou_xyxy(gts[a]["box"], gts[b]["box"])
+                if gts[a]["cls"] == gts[b]["cls"] and i_aa >= 0.7:
+                    suspects.append((2.0 + i_aa, f"duplicate GT {CLASS_NAMES[gts[a]['cls']]} IoU={i_aa:.2f}"))
+            if gts[a]["box"][2] * gts[a]["box"][3] > 0.8:
+                suspects.append((1.5, f"huge GT box area={gts[a]['box'][2]*gts[a]['box'][3]:.2f} {CLASS_NAMES[gts[a]['cls']]}"))
+            for pi, gi, i in agnostic_pairs:
+                if gi == a and preds[pi]["cls"] != gts[a]["cls"] and preds[pi]["conf"] >= 0.45 and i >= 0.55:
+                    suspects.append((1.0 + preds[pi]["conf"], f"G:{CLASS_NAMES[gts[a]['cls']]} vs P:{CLASS_NAMES[preds[pi]['cls']]} {preds[pi]['conf']:.2f} IoU={i:.2f}"))
+        if suspects:
+            sev, note = max(suspects, key=lambda t: t[0])
+            gt_err.append((sev, img, None, [note]))
     return fps, fns, low_iou, confusions, small, gt_err
 
 
@@ -115,6 +119,7 @@ def build_galleries(items, conf_thr, out_dir):
     fps, fns, low_iou, confusions, small, gt_err = analyze(items, conf_thr)
     galleries = {}
     fps.sort(key=lambda t: -t[0])
+    gt_err.sort(key=lambda t: -t[0])
     cells = [make_cell(img, it["gts"], [p], lines) for _, img, p, lines in fps[:MAX_CELLS] for it in [next(x for x in items if x["image"] == img)]]
     galleries["1_high_conf_false_positives"] = cells
     fns.sort(key=lambda t: (-t[0],))
@@ -165,7 +170,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", required=True)
     parser.add_argument("--imgsz", type=int, required=True)
-    parser.add_argument("--conf", type=float, default=0.25)
+    parser.add_argument("--conf", type=float, default=0.35)
     args = parser.parse_args()
     settings.update({"datasets_dir": str(repo_root())})
     _, items = collect_predictions(args.weights, args.imgsz, 0.01)

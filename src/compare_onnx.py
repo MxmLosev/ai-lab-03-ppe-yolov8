@@ -9,7 +9,7 @@ import onnxruntime as ort
 import torch
 from ultralytics import YOLO
 from ultralytics.data.augment import LetterBox
-from ultralytics.utils.ops import non_max_suppression
+from ultralytics.utils.nms import non_max_suppression
 
 from common import data_dir, list_images, repo_root, save_json
 

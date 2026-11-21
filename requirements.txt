@@ -1,0 +1,11 @@
+torch==2.6.0+cu124
+torchvision==0.21.0+cu124
+ultralytics==8.4.216
+ultralytics-thop==2.2.5
+opencv-python==5.1.0.95
+matplotlib==3.11.2
+numpy==2.5.4
+onnxruntime==1.32.0
+psutil==7.2.2
+PyYAML==6.0.4
+pytest==9.2.0

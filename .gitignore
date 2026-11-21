@@ -8,4 +8,5 @@ data/images/
 data/labels/
 data/_pool/
 /yolov8n.pt
+train_e*.log
 *.tmp

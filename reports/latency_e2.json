@@ -1,0 +1,40 @@
+{
+  "weights": "runs/ppe/e2-imgsz960/weights/best.pt",
+  "imgsz": 960,
+  "device": "cuda:0",
+  "precision": "fp32",
+  "conf": 0.25,
+  "nms_iou": 0.7,
+  "n_images": 10,
+  "n_timed": 150,
+  "warmup": 30,
+  "stages": {
+    "decode": {
+      "mean_ms": 1.502,
+      "median_ms": 1.492,
+      "p95_ms": 1.65
+    },
+    "preprocess_letterbox_to_gpu": {
+      "mean_ms": 3.672,
+      "median_ms": 3.64,
+      "p95_ms": 4.069
+    },
+    "inference": {
+      "mean_ms": 6.449,
+      "median_ms": 6.325,
+      "p95_ms": 7.134
+    },
+    "postprocess_nms_scale": {
+      "mean_ms": 6.377,
+      "median_ms": 7.34,
+      "p95_ms": 9.163
+    },
+    "full_call": {
+      "mean_ms": 18.0,
+      "median_ms": 18.758,
+      "p95_ms": 21.115
+    }
+  },
+  "throughput_fps_from_median": 53.31,
+  "gpu_peak_memory_mb": 75.6
+}

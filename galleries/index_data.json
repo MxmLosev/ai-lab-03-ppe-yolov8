@@ -1,0 +1,54 @@
+{
+  "weights": "models/ppe_best.pt",
+  "conf": 0.35,
+  "galleries": {
+    "1_high_conf_false_positives": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        968
+      ],
+      "title": "False positives with high confidence"
+    },
+    "2_missed_critical": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        968
+      ],
+      "title": "Missed objects of critical class (NO-Hardhat)"
+    },
+    "3_low_iou_matches": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        968
+      ],
+      "title": "Matched boxes with low IoU"
+    },
+    "4_class_confusion": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        968
+      ],
+      "title": "Confusion between similar classes"
+    },
+    "5_small_and_occluded": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        1220
+      ],
+      "title": "Small and occluded objects"
+    },
+    "6_suspected_gt_errors": {
+      "cells": 8,
+      "size_px": [
+        1680,
+        968
+      ],
+      "title": "Suspected ground truth annotation errors"
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "splits": {
+    "train": {
+      "images": 570,
+      "boxes": 8181,
+      "empty_label_images": 7,
+      "boxes_per_class": {
+        "Hardhat": 623,
+        "Mask": 393,
+        "NO-Hardhat": 649,
+        "NO-Mask": 727,
+        "NO-Safety Vest": 1154,
+        "Person": 2175,
+        "Safety Cone": 1017,
+        "Safety Vest": 445,
+        "machinery": 735,
+        "vehicle": 263
+      },
+      "mean_width_px": 640.0
+    },
+    "val": {
+      "images": 124,
+      "boxes": 1861,
+      "empty_label_images": 0,
+      "boxes_per_class": {
+        "Hardhat": 148,
+        "Mask": 79,
+        "NO-Hardhat": 128,
+        "NO-Mask": 179,
+        "NO-Safety Vest": 218,
+        "Person": 491,
+        "Safety Cone": 243,
+        "Safety Vest": 135,
+        "machinery": 163,
+        "vehicle": 77
+      },
+      "mean_width_px": 640.0
+    },
+    "test": {
+      "images": 127,
+      "boxes": 2059,
+      "empty_label_images": 1,
+      "boxes_per_class": {
+        "Hardhat": 152,
+        "Mask": 117,
+        "NO-Hardhat": 151,
+        "NO-Mask": 168,
+        "NO-Safety Vest": 267,
+        "Person": 535,
+        "Safety Cone": 307,
+        "Safety Vest": 98,
+        "machinery": 189,
+        "vehicle": 75
+      },
+      "mean_width_px": 640.0
+    }
+  }
+}

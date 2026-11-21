@@ -1,0 +1,40 @@
+{
+  "weights": "runs/ppe/e1-opora/weights/best.pt",
+  "imgsz": 640,
+  "device": "cuda:0",
+  "precision": "fp32",
+  "conf": 0.25,
+  "nms_iou": 0.7,
+  "n_images": 10,
+  "n_timed": 150,
+  "warmup": 30,
+  "stages": {
+    "decode": {
+      "mean_ms": 1.503,
+      "median_ms": 1.497,
+      "p95_ms": 1.656
+    },
+    "preprocess_letterbox_to_gpu": {
+      "mean_ms": 1.19,
+      "median_ms": 1.174,
+      "p95_ms": 1.361
+    },
+    "inference": {
+      "mean_ms": 6.616,
+      "median_ms": 6.442,
+      "p95_ms": 7.61
+    },
+    "postprocess_nms_scale": {
+      "mean_ms": 6.223,
+      "median_ms": 6.112,
+      "p95_ms": 10.429
+    },
+    "full_call": {
+      "mean_ms": 15.532,
+      "median_ms": 15.58,
+      "p95_ms": 19.915
+    }
+  },
+  "throughput_fps_from_median": 64.19,
+  "gpu_peak_memory_mb": 40.3
+}

@@ -1,0 +1,6 @@
+name: e2-imgsz960
+epochs: 50
+imgsz: 960
+batch: 16
+seed: 42
+deterministic: true
